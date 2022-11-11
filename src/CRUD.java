@@ -7,8 +7,8 @@ public class CRUD {
     Connection cn;
     public Connection conect() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto2_chat?allowPublicKeyRetrieval=true&useSSL=false", "root", "andres4646");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto2_chat?allowPublicKeyRetrieval=true&useSSL=false", "root", "hola123");
             System.out.println("conexion establecida");
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
