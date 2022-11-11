@@ -59,7 +59,7 @@ public class CRUD {
         return false;
     }
 
-
+    //Registrar Usuario
     public void InsertaUsuario(String n,String c) throws Exception {
         conect();
         if(!UsuarioRepetido(n)) {
@@ -114,6 +114,7 @@ public class CRUD {
         return false;
     }
 
+    //Filtrar
     public User Buscar(String Bus){
         conect();
         String sql = "select * from usuario where nombre_usuario like '%"+Bus+"%'";
@@ -138,6 +139,7 @@ public class CRUD {
 
     }
 
+    //Retorna Contactos
     public List<User> retornaContactos(Integer id){
         conect();
         List<User> contactos = new ArrayList<>();
@@ -165,6 +167,7 @@ public class CRUD {
         return contactos;
     }
 
+    //Agregar Usuario Lista Contacto
     public void AgregaContacto(Integer idUsuario,Integer idContacto){
         conect();
         if(IdRepetido(idUsuario) && IdRepetido(idContacto)){
@@ -200,8 +203,132 @@ public class CRUD {
         }
     }
 
+    //Crear Sala
+    public void CrearSala(String nombre, Integer admin, String descripcion) throws Exception {
+        conect();
+        String sql = "INSERT INTO sala (nombre_sala, admin_sala, descripcion_sala)" + "VALUES " + "(?,?,?)";
+
+        try {
+            PreparedStatement statement = cn.prepareStatement(sql);
+
+            statement.setString(1, nombre);
+            statement.setInt(2, admin);
+            statement.setString(3,descripcion);
+
+            int rowsInserted = statement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Sala Creada");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in connection: " + e.toString());
+        }
+        finally {
+            close();
+        }
+    }
+
+    //Afiliar Usuario a Sala
+    public void AgregaMiembroSala(Integer idSala,Integer idUsuario) throws Exception {
+        conect();
+        String sql = "INSERT INTO miembros_sala (id_sala, id_usuario)" + "VALUES " + "(?,?)";
+        //getting input from user
+
+        try {
+            PreparedStatement statement = cn.prepareStatement(sql);
+            //setting parameter values
+            statement.setInt(1, idSala);
+            statement.setInt(2, idUsuario);
+
+            //executing query which will return an integer value
+            int rowsInserted = statement.executeUpdate();
+            //if rowInserted is greater than 0 mean rows are inserted
+            if (rowsInserted > 0) {
+                System.out.println("Usuario insertado a la sala");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in connection: " + e.toString());
+        }
+        finally {
+            close();
+        }
+    }
+
+    //Desafiliar Usuario a Sala
+    public void EliminarMiembroSala(Integer idSala,Integer idUsuario) throws Exception {
+        conect();
+        String sql = "DELETE FROM miembros_sala WHERE id_sala = ? and id_usuario = ?";
+
+        try {
+            PreparedStatement statement = cn.prepareStatement(sql);
+            statement.setInt(1, idSala);
+            statement.setInt(2, idUsuario);
+
+            int rowsInserted = statement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Usuario elimnado de la sala");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in connection: " + e.toString());
+        }
+        finally {
+            close();
+        }
+    }
+
+    public int GetIDUser(String userName) throws Exception{
+        conect();
+        String sql = "SELECT id_usuario FROM usuario where nombre_usuario = "+"'"+userName+"'";
+
+        try {
+            Statement st;
+            st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            if(rs.next()){
+                return rs.getInt("id_usuario");
+            }
+            close();
+        } catch (Exception e) {
+            System.out.println("Exception in connection: " + e.toString());
+        }
+        return 0;
+    }
+
+    public int GetIDSala(String sala) throws Exception{
+        conect();
+        String sql = "SELECT id_sala FROM sala where nombre_sala = "+"'"+sala+"'";
+
+        try {
+            Statement st;
+            st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            if(rs.next()){
+                return rs.getInt("id_sala");
+            }
+            close();
+        } catch (Exception e) {
+            System.out.println("Exception in connection: " + e.toString());
+        }
+        return 0;
+    }
+
     public static void main(String[] args) {
         CRUD cr = new CRUD();
         cr.AgregaContacto(4,2);
+
+        /*
+        cr.InsertaUsuario("Jequiros","cacahuate");
+        cr.InsertaUsuario("MariaJJ", "amarillo");
+        cr.InsertaUsuario("Juan", "skittles");
+
+        cr.CrearSala("Memes",cr.GetIDUser("MariaJJ"),"Pasar memes");
+
+        cr.AgregaMiembroSala(cr.GetIDSala("Memes"),cr.GetIDUser("Jequiros"));
+        cr.AgregaMiembroSala(cr.GetIDSala("Memes"),cr.GetIDUser("Juan"));
+        cr.AgregaMiembroSala(cr.GetIDSala("Memes"),cr.GetIDUser("MariaJJ"));
+
+        cr.EliminarMiembroSala(cr.GetIDSala("Memes"),cr.GetIDUser("Jequiros"));
+        */
     }
 }
